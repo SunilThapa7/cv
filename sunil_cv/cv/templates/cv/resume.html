@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Professional CV of {{ profile.name }}" />
+  <title>{{ profile.name }} – {{ profile.job_title }}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="container header-grid">
+      <div class="identity">
+        <h1 class="name">{{ profile.name|upper }}</h1>
+        <p class="role">{{ profile.job_title }}</p>
+      </div>
+      <aside class="contact">
+        <ul class="contact-list">
+          <li><span>📞</span><a href="tel:{{ profile.phone }}">{{ profile.phone }}</a></li>
+          <li><span>✉️</span><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></li>
+          <li><span>🔗</span><a href="{{ profile.portfolio_url }}" target="_blank">Portfolio</a></li>
+          <li><span>📍</span><span>{{ profile.location }}</span></li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <main id="main" class="site-main">
+    <div class="container card">
+      <section>
+        <h2>About Me</h2>
+        <p>{{ profile.about|linebreaksbr }}</p>
+      </section>
+
+      <hr/>
+
+      <section>
+        <h2>Education</h2>
+        {% for edu in education %}
+        <article class="edu-item">
+          <h3>{{ edu.degree }} <span class="muted">| {{ edu.start_year }}–{{ edu.end_year }}{% if edu.ongoing %} | Ongoing{% endif %}</span></h3>
+          <p><strong>{{ edu.institution }}</strong></p>
+        </article>
+        {% endfor %}
+      </section>
+
+      <hr/>
+      <section>
+        <h2>Work Experience</h2>
+        {% for ex in experience %}
+        <article class="exp-item">
+          <header>
+            <h3>{{ ex.title }}</h3>
+            <p class="muted">{{ ex.company }} • {{ ex.start_year }}–{{ ex.end_year }}{% if ex.current %} • Present{% endif %}{% if ex.external_url %} • <a href="{{ ex.external_url }}" target="_blank">{{ ex.external_url }}</a>{% endif %}</p>
+          </header>
+          <ul>
+            {% for b in ex.bullets.all %}
+              <li>{{ b.text }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+        {% endfor %}
+      </section>
+
+      <!-- projects, skills, attributes, languages follow same pattern -->
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="muted">{{ profile.footer_text }}</p>
+    </div>
+  </footer>
+</body>
+</html>
