@@ -25,6 +25,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.venv/
 
 # IDE
 .idea/
@@ -44,3 +45,7 @@ db.sqlite3
 
 # Logs
 *.log
+
+# Django runtime/uploaded assets
+media/
+staticfiles/
