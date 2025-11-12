@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ profile.name }} – {{ profile.job_title }} (Classic)</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    /* ====== Base Layout ====== */
+    body {
+      background: #f9fafb;
+      color: #111;
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ====== Container ====== */
+    .classic {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 36px 40px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 8px;
+    }
+
+    /* ====== Header ====== */
+    .header {
+      border-bottom: 2px solid #222;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .job-title {
+      color: #555;
+      font-size: 1.1rem;
+      margin-top: 4px;
+    }
+
+    .contact-info {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .contact-info span,
+    .contact-info a {
+      margin-right: 8px;
+    }
+
+    .contact-info span:not(:last-child)::after,
+    .contact-info a:not(:last-child)::after {
+      content: "•";
+      margin-left: 8px;
+      color: #999;
+    }
+
+    /* ====== Buttons ====== */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .actions button,
+    .actions a {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .actions button:hover,
+    .actions a:hover {
+      background: #1e40af;
+    }
+
+    /* ====== Section Headings ====== */
+    h2 {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #222;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    h3 {
+      margin: 4px 0;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 4px 0 10px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    ul {
+      margin: 6px 0 10px;
+      padding-left: 20px;
+    }
+
+    /* ====== Columns ====== */
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 12px;
+    }
+
+    /* ====== Footer ====== */
+    footer {
+      margin-top: 28px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+      color: #666;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    /* ====== Print Styles ====== */
+    @media print {
+      body {
+        background: #fff;
+      }
+      .classic {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      .actions {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="classic">
+    <!-- ====== Action Buttons ====== -->
+    <div class="actions">
+      <button onclick="window.print()">Print</button>
+      <a href="{% if template %}{% url 'download_resume' slug=template.slug %}{% else %}{% url 'download_resume_default' %}{% endif %}">
+        Download
+      </a>
+    </div>
+
+    <!-- ====== Header ====== -->
+    <header class="header">
+      <h1>{{ profile.name|upper }}</h1>
+      <div class="job-title">{{ profile.job_title }}</div>
+      <div class="contact-info">
+        <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
+        <a href="tel:{{ profile.phone }}">{{ profile.phone }}</a>
+        {% if profile.portfolio_url %}
+          <a href="{{ profile.portfolio_url }}" target="_blank">Portfolio</a>
+        {% endif %}
+        <span>{{ profile.location }}</span>
+      </div>
+    </header>
+
+    <!-- ====== About ====== -->
+    <section>
+      <h2>About</h2>
+      <p>{{ profile.about|linebreaksbr }}</p>
+    </section>
+
+    <!-- ====== Education ====== -->
+    <section>
+      <h2>Education</h2>
+      {% for edu in education %}
+        <p>
+          <strong>{{ edu.degree }}</strong> — {{ edu.institution }}
+          ({{ edu.start_year }}–{{ edu.end_year }}{% if edu.ongoing %}, Ongoing{% endif %})
+        </p>
+      {% empty %}
+        <p>No education details provided.</p>
+      {% endfor %}
+    </section>
+
+    <!-- ====== Experience ====== -->
+    <section>
+      <h2>Experience</h2>
+      {% for ex in experience %}
+        <div style="margin-bottom: 12px;">
+          <h3>{{ ex.title }} — {{ ex.company }}</h3>
+          <div class="muted">
+            {{ ex.start_year }}–{{ ex.end_year }}{% if ex.current %} • Present{% endif %}
+          </div>
+          {% if ex.external_url %}
+            <div><a href="{{ ex.external_url }}" target="_blank">{{ ex.external_url }}</a></div>
+          {% endif %}
+          <ul>
+            {% for b in ex.bullets.all %}
+              <li>{{ b.text }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% empty %}
+        <p>No experience listed.</p>
+      {% endfor %}
+    </section>
+
+    <!-- ====== Projects, Skills, Attributes, Languages ====== -->
+    <section class="cols">
+      <div>
+        <h2>Projects</h2>
+        {% for project in projects %}
+          <p>
+            <strong>{{ project.title }}</strong> — {{ project.description }}
+            {% if project.link %}
+              <a href="{{ project.link }}" target="_blank">View</a>
+            {% endif %}
+          </p>
+        {% empty %}
+          <p>No projects available.</p>
+        {% endfor %}
+      </div>
+
+      <div>
+        <h2>Skills</h2>
+        {% for cat in skills %}
+          <p>
+            <strong>{{ cat.title }}</strong>:
+            {% for s in cat.skills.all %}
+              {{ s.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+        {% empty %}
+          <p>No skills listed.</p>
+        {% endfor %}
+
+        <h2>Attributes</h2>
+        <ul>
+          {% for attr in attributes %}
+            <li>{{ attr.text }}</li>
+          {% empty %}
+            <li>No attributes listed.</li>
+          {% endfor %}
+        </ul>
+
+        <h2>Languages</h2>
+        <ul>
+          {% for lang in languages %}
+            <li>{{ lang.name }}{% if lang.level %} ({{ lang.level }}){% endif %}</li>
+          {% empty %}
+            <li>No languages listed.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <!-- ====== Footer ====== -->
+    <footer>
+      © {{ current_year }} {{ profile.name }} • CV
+    </footer>
+  </div>
+</body>
+</html>

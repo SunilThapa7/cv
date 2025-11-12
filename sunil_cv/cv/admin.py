@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     SiteProfile, Education, Experience, ExperienceBullet, Project,
-    SkillCategory, Skill, PersonalAttribute, Language, JsonLd
+    SkillCategory, Skill, PersonalAttribute, Language, JsonLd, ResumeTemplate
 )
 
 # Inline bullets inside Experience
@@ -50,12 +50,18 @@ class LanguageAdmin(admin.ModelAdmin):
 
 @admin.register(SiteProfile)
 class SiteProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'job_title', 'active_template')
     fieldsets = (
         (None, {'fields': ('name', 'job_title', 'about')}),
         ('Contact', {'fields': ('phone', 'email', 'portfolio_url', 'location')}),
-        ('Footer', {'fields': ('footer_text',)}),
+        ('Footer & Template', {'fields': ('footer_text', 'active_template')}),
     )
 
 @admin.register(JsonLd)
 class JsonLdAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(ResumeTemplate)
+class ResumeTemplateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'template_path')
+    prepopulated_fields = {'slug': ('name',)}

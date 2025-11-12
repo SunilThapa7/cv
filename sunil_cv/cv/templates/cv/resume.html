@@ -64,14 +64,83 @@
         {% endfor %}
       </section>
 
-      <!-- projects, skills, attributes, languages follow same pattern -->
+      <hr />
+
+      <section>
+        <h2>Projects</h2>
+        {% for project in projects %}
+        <article class="proj-item">
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.description }}{% if project.link %} <a href="{{ project.link }}" target="_blank">View Project</a>{% endif %}</p>
+        </article>
+        {% endfor %}
+      </section>
+
+      <hr />
+
+      <section class="skills">
+        <h2>Skills</h2>
+        <div class="skills-grid">
+          {% for skill_category in skills %}
+          <ul>
+            <li><strong>{{ skill_category.title }}</strong></li>
+            {% for skill in skill_category.skills.all %}
+            <li>{{ skill.name }}</li>
+            {% endfor %}
+          </ul>
+          {% endfor %}
+        </div>
+      </section>
+
+      <hr />
+
+      <section>
+        <h2>Personal Attributes</h2>
+        <ul class="cols-2">
+          {% for attr in attributes %}
+          <li>{{ attr.text }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <hr />
+
+      <section>
+        <h2>Languages</h2>
+        <ul class="cols-3">
+          {% for language in languages %}
+          <li>{{ language.name }}{% if language.level %} ({{ language.level }}){% endif %}</li>
+          {% endfor %}
+        </ul>
+      </section>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p class="muted">{{ profile.footer_text }}</p>
+      <p class="muted">© {{ current_year }} {{ profile.name }} • CV</p>
     </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{ profile.name }}",
+    "jobTitle": "{{ profile.job_title }}",
+    "email": "mailto:{{ profile.email }}",
+    "telephone": "{{ profile.phone }}",
+    "url": "{{ profile.portfolio_url }}",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ profile.location }}",
+      "addressCountry": "NP"
+    },
+    "sameAs": [
+      "{{ profile.portfolio_url }}"
+    ]
+  }
+  </script>
   </footer>
 </body>
 </html>

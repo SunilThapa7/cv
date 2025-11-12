@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Resume Templates</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    .grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+    .card { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
+    .card img { width:100%; height:auto; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Resume Templates</h1>
+    <div class="grid">
+      {% for t in templates %}
+        <div class="card">
+          <h3>{{ t.name }}</h3>
+          {% if t.preview_image %}<img src="{{ t.preview_image.url }}" alt="{{ t.name }} preview">{% endif %}
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <a href="{% url 'resume_by_slug' slug=t.slug %}">Preview</a>
+            <a href="{% url 'download_resume' slug=t.slug %}">Download</a>
+          </div>
+        </div>
+      {% empty %}
+        <p>No templates yet. Add them in Admin.</p>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+</html>

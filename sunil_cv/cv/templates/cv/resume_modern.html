@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ profile.name }} – {{ profile.job_title }} (Modern)</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    /* ====== Color Theme ====== */
+    :root {
+      --bg: #0f172a;
+      --card-bg: #0b1220;
+      --border: #1f2937;
+      --text: #e2e8f0;
+      --subtext: #94a3b8;
+      --accent: #38bdf8;
+      --highlight: #0ea5e9;
+    }
+
+    /* ====== Base Styles ====== */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 4px;
+      color: var(--highlight);
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 6px 0;
+    }
+
+    /* ====== Layout ====== */
+    .wrap {
+      max-width: 960px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px dashed #334155;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+
+    .header-left h1 {
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+
+    .chip {
+      background: var(--highlight);
+      color: var(--card-bg);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      display: inline-block;
+    }
+
+    .header-right {
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 28px;
+    }
+
+    main section, aside section {
+      margin-bottom: 20px;
+    }
+
+    footer {
+      margin-top: 24px;
+      border-top: 1px dashed #334155;
+      padding-top: 8px;
+      font-size: 0.9rem;
+      color: var(--subtext);
+      text-align: center;
+    }
+
+    /* ====== Buttons ====== */
+    button, .actions a {
+      background: var(--highlight);
+      color: var(--card-bg);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    button:hover, .actions a:hover {
+      background: var(--accent);
+    }
+
+    /* ====== Print Styles ====== */
+    @media print {
+      .actions { display: none; }
+      .wrap {
+        border: none;
+        border-radius: 0;
+      }
+      body {
+        background: #fff;
+        color: #000;
+      }
+      a {
+        color: #000;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- ====== Action Buttons ====== -->
+    <div class="actions">
+      <button onclick="window.print()">Print</button>
+      <a href="{% if template %}{% url 'download_resume' slug=template.slug %}{% else %}{% url 'download_resume_default' %}{% endif %}">
+        Download
+      </a>
+    </div>
+
+    <!-- ====== Header ====== -->
+    <header class="header">
+      <div class="header-left">
+        <h1>{{ profile.name }}</h1>
+        <div class="chip">{{ profile.job_title }}</div>
+      </div>
+      <div class="header-right">
+        <div><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></div>
+        <div><a href="tel:{{ profile.phone }}">{{ profile.phone }}</a></div>
+        {% if profile.portfolio_url %}
+          <div><a href="{{ profile.portfolio_url }}" target="_blank">Portfolio</a></div>
+        {% endif %}
+        <div>{{ profile.location }}</div>
+      </div>
+    </header>
+
+    <!-- ====== About Section ====== -->
+    <section>
+      <h2>About</h2>
+      <p>{{ profile.about|linebreaksbr }}</p>
+    </section>
+
+    <!-- ====== Main Grid ====== -->
+    <div class="grid">
+      <main>
+        <!-- ====== Experience ====== -->
+        <section>
+          <h2>Experience</h2>
+          {% for ex in experience %}
+            <article>
+              <h3>{{ ex.title }} — {{ ex.company }}</h3>
+              <div class="meta" style="font-size: 0.85rem; color: var(--subtext);">
+                {{ ex.start_year }}–{{ ex.end_year }}
+                {% if ex.current %} • Present{% endif %}
+                {% if ex.external_url %}
+                  • <a href="{{ ex.external_url }}" target="_blank">{{ ex.external_url }}</a>
+                {% endif %}
+              </div>
+              <ul>
+                {% for b in ex.bullets.all %}
+                  <li>{{ b.text }}</li>
+                {% endfor %}
+              </ul>
+            </article>
+          {% empty %}
+            <p>No experience listed.</p>
+          {% endfor %}
+        </section>
+
+        <!-- ====== Projects ====== -->
+        <section>
+          <h2>Projects</h2>
+          {% for project in projects %}
+            <p>
+              <strong>{{ project.title }}</strong> — {{ project.description }}
+              {% if project.link %}
+                <a href="{{ project.link }}" target="_blank">View</a>
+              {% endif %}
+            </p>
+          {% empty %}
+            <p>No projects available.</p>
+          {% endfor %}
+        </section>
+      </main>
+
+      <!-- ====== Sidebar ====== -->
+      <aside>
+        <section>
+          <h2>Education</h2>
+          {% for edu in education %}
+            <p>
+              <strong>{{ edu.degree }}</strong> — {{ edu.institution }}
+              ({{ edu.start_year }}–{{ edu.end_year }}{% if edu.ongoing %}, Ongoing{% endif %})
+            </p>
+          {% empty %}
+            <p>No education details.</p>
+          {% endfor %}
+        </section>
+
+        <section>
+          <h2>Skills</h2>
+          {% for cat in skills %}
+            <p>
+              <strong>{{ cat.title }}</strong>:
+              {% for s in cat.skills.all %}
+                {{ s.name }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% empty %}
+            <p>No skills listed.</p>
+          {% endfor %}
+        </section>
+
+        <section>
+          <h2>Languages</h2>
+          <ul>
+            {% for lang in languages %}
+              <li>{{ lang.name }}{% if lang.level %} ({{ lang.level }}){% endif %}</li>
+            {% empty %}
+              <li>No languages added.</li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section>
+          <h2>Attributes</h2>
+          <ul>
+            {% for attr in attributes %}
+              <li>{{ attr.text }}</li>
+            {% empty %}
+              <li>No attributes listed.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <!-- ====== Footer ====== -->
+    <footer>
+      © {{ current_year }} {{ profile.name }} • CV
+    </footer>
+  </div>
+</body>
+</html>

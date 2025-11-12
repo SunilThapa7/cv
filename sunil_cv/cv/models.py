@@ -10,6 +10,16 @@ class SingletonModel(models.Model):
         self.pk = 1
         super().save(*args, **kwargs)
 
+# Template metadata for rendering multiple resume layouts
+class ResumeTemplate(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    template_path = models.CharField(max_length=255, help_text="e.g., cv/resume_modern.html")
+    preview_image = models.ImageField(upload_to='template_previews/', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 # Single top-level profile for the CV owner
 class SiteProfile(SingletonModel):
     name = models.CharField(max_length=200, default="Sunil Thapa")
@@ -20,6 +30,7 @@ class SiteProfile(SingletonModel):
     portfolio_url = models.URLField(blank=True)
     location = models.CharField(max_length=200, blank=True)
     footer_text = models.CharField(max_length=255, blank=True, default="© 2025 Sunil Thapa • CV")
+    active_template = models.ForeignKey('ResumeTemplate', on_delete=models.SET_NULL, null=True, blank=True, related_name='profiles')
 
     def __str__(self):
         return f"{self.name} ({self.job_title})"
